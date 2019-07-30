@@ -41,5 +41,11 @@ namespace TestUseFaceDetectLib
             Debug.WriteLine(e.ResultFrame.Count);
             Debug.WriteLine("******************");
         }
+
+        protected override void OnNavigatedFrom(NavigationEventArgs e)
+        {
+            this._faceDetection.StopDetect();
+            base.OnNavigatedFrom(e);
+        }
     }
 }

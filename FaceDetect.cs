@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Windows.Media.Capture;
 using Windows.Media.Core;
-using Windows.Media.MediaProperties;
 using Windows.UI.Xaml.Controls;
 
 namespace FaceDetect
@@ -22,17 +17,40 @@ namespace FaceDetect
         // required dependencies for face detect
         private FaceDetectionEffect _faceDetectionEffect;
         private MediaCapture _mediaCapture;
+        private CaptureElement _captureElement;
 
-
+        // start face detection
         public async void StartDetect()
         {
-            var captureElement = new CaptureElement();
+            this._captureElement = new CaptureElement();
             this._mediaCapture = new MediaCapture();
             await this._mediaCapture.InitializeAsync();
-            captureElement.Source = _mediaCapture;
+            this._captureElement.Source = _mediaCapture;
             await _mediaCapture.StartPreviewAsync();
             // start detect face after start the camera
             this.DetectFace();
+        }
+
+        // stop face detection
+        public async void StopDetect()
+        {
+            this._faceDetectionEffect.Enabled = false;
+            this._faceDetectionEffect.FaceDetected -= FaceDetectionEffect_FaceDetected;
+            await this._mediaCapture.ClearEffectsAsync(MediaStreamType.VideoPreview);
+            this._faceDetectionEffect = null;
+            await this.CleanupCameraAsync();
+        }
+
+        private async Task CleanupCameraAsync()
+        {
+            if (this._mediaCapture != null)
+            {
+                await this._mediaCapture.StopPreviewAsync();
+            }
+
+            this._captureElement.Source = null;
+            this._mediaCapture.Dispose();
+            this._mediaCapture = null;
         }
 
         // face detection process
