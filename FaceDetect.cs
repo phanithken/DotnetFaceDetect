@@ -26,7 +26,8 @@ namespace FaceDetect
             this._mediaCapture = new MediaCapture();
             await this._mediaCapture.InitializeAsync();
             this._captureElement.Source = _mediaCapture;
-            await _mediaCapture.StartPreviewAsync();
+            await this._mediaCapture.StartPreviewAsync();
+
             // start detect face after start the camera
             this.DetectFace();
         }
@@ -36,8 +37,10 @@ namespace FaceDetect
         {
             this._faceDetectionEffect.Enabled = false;
             this._faceDetectionEffect.FaceDetected -= FaceDetectionEffect_FaceDetected;
-            await this._mediaCapture.ClearEffectsAsync(MediaStreamType.VideoPreview);
             this._faceDetectionEffect = null;
+            await this._mediaCapture.ClearEffectsAsync(MediaStreamType.VideoPreview);
+
+            // uninnitialize camera
             await this.CleanupCameraAsync();
         }
 
